@@ -42,17 +42,18 @@ public class ScoreFragment extends Fragment {
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-							 Bundle savedInstanceState) {
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		FragmentScoreBinding binding = DataBindingUtil
 				.inflate(inflater, R.layout.fragment_score, container, false);
 		binding.setHomeGoalScorerList(homeGoalScorerList);
 		binding.setAwayGoalScorerList(awayGoalScorerList);
 		binding.setFragment(this);
 
-		getParentFragmentManager().setFragmentResultListener(HOME_REQUEST_KEY, this, new FragmentResultListener() {
+		getParentFragmentManager().setFragmentResultListener(HOME_REQUEST_KEY, this, new  FragmentResultListener() {
 			@Override
 			public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+				GoalScorer goalScorer = result.getParcelable(SCORER_KEY);
+				homeGoalScorerList.add(goalScorer);
 
 			}
 		});
@@ -60,9 +61,12 @@ public class ScoreFragment extends Fragment {
 		getParentFragmentManager().setFragmentResultListener(AWAY_REQUEST_KEY, this, new FragmentResultListener() {
 			@Override
 			public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+				GoalScorer goalScorer = result.getParcelable(SCORER_KEY);
+				awayGoalScorerList.add(goalScorer);
 
 			}
 		});
+
 		return binding.getRoot();
 	}
 
@@ -76,4 +80,21 @@ public class ScoreFragment extends Fragment {
 		Navigation.findNavController(view).navigate(action);
 	}
 
+	public String getHome(){
+		StringBuilder nama = new StringBuilder();
+		for (int i=0; i<homeGoalScorerList.size(); i++){
+			nama.append(homeGoalScorerList.get(i).toString());
+		}
+
+		return nama.toString();
+	}
+
+	public String getAway(){
+		StringBuilder nama = new StringBuilder();
+		for (int i=0; i<awayGoalScorerList.size(); i++){
+			nama.append(awayGoalScorerList.get(i).toString());
+		}
+
+		return nama.toString();
+	}
 }

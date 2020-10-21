@@ -27,9 +27,7 @@ public class GoalFragment extends Fragment {
 
 	private String requestKey;
 	private GoalScorer goalScorer;
-
-	private List<GoalScorer> homeGoalScorerList;
-	private List<GoalScorer> awayGoalScorerList;
+	private FragmentGoalBinding binding;
 
 	public GoalFragment() {
 		// Required empty public constructor
@@ -42,18 +40,8 @@ public class GoalFragment extends Fragment {
 	}
 
 	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-							 Bundle savedInstanceState) {
-
-		getParentFragmentManager().setFragmentResultListener(HOME_REQUEST_KEY, this, new FragmentResultListener() {
-			@Override
-			public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
-				GoalScorer goalScorer = result.getParcelable(SCORER_KEY);
-				homeGoalScorerList.add(goalScorer);
-			}
-		});
-
-		FragmentGoalBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_goal, container, false);
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		binding = DataBindingUtil.inflate(inflater, R.layout.fragment_goal, container, false);
 		binding.setFragment(this);
 		binding.setGoalScorer(goalScorer);
 		requestKey = GoalFragmentArgs.fromBundle(getArguments()).getRequestKey();
@@ -61,6 +49,8 @@ public class GoalFragment extends Fragment {
 	}
 
 	public void onSaveClicked(View view) {
+		goalScorer.setName(binding.inputName.getText().toString());
+		goalScorer.setMinute(Integer.parseInt(binding.inputMinute.getText().toString()));
 		Bundle bundle = new Bundle();
 		bundle.putParcelable(ScoreFragment.SCORER_KEY, goalScorer);
 		getParentFragmentManager().setFragmentResult(requestKey, bundle);
