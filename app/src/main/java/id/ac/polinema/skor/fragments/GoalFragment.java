@@ -5,9 +5,20 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentResultListener;
+import androidx.navigation.Navigation;
 
+import java.util.List;
+
+import id.ac.polinema.skor.R;
+import id.ac.polinema.skor.databinding.FragmentGoalBinding;
 import id.ac.polinema.skor.models.GoalScorer;
+
+import static id.ac.polinema.skor.fragments.ScoreFragment.HOME_REQUEST_KEY;
+import static id.ac.polinema.skor.fragments.ScoreFragment.SCORER_KEY;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -16,6 +27,9 @@ public class GoalFragment extends Fragment {
 
 	private String requestKey;
 	private GoalScorer goalScorer;
+
+	private List<GoalScorer> homeGoalScorerList;
+	private List<GoalScorer> awayGoalScorerList;
 
 	public GoalFragment() {
 		// Required empty public constructor
@@ -30,14 +44,30 @@ public class GoalFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 							 Bundle savedInstanceState) {
-		return null;
+
+		getParentFragmentManager().setFragmentResultListener(HOME_REQUEST_KEY, this, new FragmentResultListener() {
+			@Override
+			public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+				GoalScorer goalScorer = result.getParcelable(SCORER_KEY);
+				homeGoalScorerList.add(goalScorer);
+			}
+		});
+
+		FragmentGoalBinding binding = DataBindingUtil.inflate(inflater, R.layout.fragment_goal, container, false);
+		binding.setFragment(this);
+		binding.setGoalScorer(goalScorer);
+		requestKey = GoalFragmentArgs.fromBundle(getArguments()).getRequestKey();
+		return binding.getRoot();
 	}
 
 	public void onSaveClicked(View view) {
-
+		Bundle bundle = new Bundle();
+		bundle.putParcelable(ScoreFragment.SCORER_KEY, goalScorer);
+		getParentFragmentManager().setFragmentResult(requestKey, bundle);
+		Navigation.findNavController(view).navigateUp();
 	}
 
 	public void onCancelClicked(View view) {
-
+		Navigation.findNavController(view).navigateUp();
 	}
 }
